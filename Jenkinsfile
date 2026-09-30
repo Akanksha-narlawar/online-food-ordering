@@ -3,12 +3,11 @@ pipeline {
 
     environment {
         DOCKER = "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
+        COMPOSE = "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker-compose.exe"
 
         DB_NAME = "orders_db"
         DB_USER = "orders_user"
         DB_PASSWORD = "orders_password"
-
-        ORDER_ID = ""
     }
 
     stages {
@@ -38,7 +37,7 @@ DB_PASSWORD=$env:DB_PASSWORD
             steps {
                 echo 'Building Order API Docker image...'
 
-                bat '"%DOCKER%" compose build order-api'
+                bat '"%COMPOSE%" build order-api'
             }
         }
 
@@ -46,7 +45,7 @@ DB_PASSWORD=$env:DB_PASSWORD
             steps {
                 echo 'Starting Nginx, Order API and PostgreSQL...'
 
-                bat '"%DOCKER%" compose up -d'
+                bat '"%COMPOSE%" up -d'
             }
         }
 
@@ -146,7 +145,7 @@ DB_PASSWORD=$env:DB_PASSWORD
                 powershell '''
                     $orderId = (Get-Content order-result.txt).Split("=")[1]
 
-                    $result = & "$env:DOCKER" compose exec -T db `
+                    $result = & "$env:COMPOSE" exec -T db `
                         psql -U "$env:DB_USER" `
                         -d "$env:DB_NAME" `
                         -t -A `
@@ -169,7 +168,7 @@ DB_PASSWORD=$env:DB_PASSWORD
             steps {
                 echo 'Displaying container status...'
 
-                bat '"%DOCKER%" compose ps'
+                bat '"%COMPOSE%" ps'
             }
         }
     }
@@ -179,13 +178,13 @@ DB_PASSWORD=$env:DB_PASSWORD
         failure {
             echo 'Pipeline failed. Displaying useful container logs...'
 
-            bat '"%DOCKER%" compose logs --no-color db order-api nginx'
+            bat '"%COMPOSE%" logs --no-color db order-api nginx'
         }
 
         always {
             echo 'Stopping application containers...'
 
-            bat '"%DOCKER%" compose down'
+            bat '"%COMPOSE%" down'
         }
     }
 }
