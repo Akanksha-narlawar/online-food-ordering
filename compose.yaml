@@ -22,7 +22,7 @@ services:
     image: order-api:latest
     container_name: food-order-api
     environment:
-      DB_HOST: localhost
+      DB_HOST: db
       DB_PORT: 5432
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
